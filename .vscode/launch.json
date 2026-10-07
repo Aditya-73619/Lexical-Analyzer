@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/apple/Emertxe/C/Project/Lexical Analyzer - Project",
+      "program": "/Users/apple/Emertxe/C/Project/Lexical Analyzer - Project/build/Debug/outDebug"
+    }
+  ]
+}
