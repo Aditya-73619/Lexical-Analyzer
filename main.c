@@ -15,8 +15,9 @@ int main(int argc,char *argv[]){
         return e_failure;
     }
     else{
-        if(do_lexical_analysis(&lexinfo) == e_success)
-            printf("Analysis is Succes\n");
+        if(do_lexical_analysis(&lexinfo) == e_success){
+            printf("Analysis is Success\n");
+        }
     }
 
 

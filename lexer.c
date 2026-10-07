@@ -23,6 +23,9 @@ Status read_and_validate_args(char *argv[], LexInfo *lexinfo)
         return e_failure;
     }
 
+    printf("Open\t: %s : Success\n",lexinfo->file_name);
+    printf("Parsing\t: %s : Started\n\n",lexinfo->file_name);
+
     return e_success;
 }
 
@@ -35,6 +38,7 @@ Status do_lexical_analysis(LexInfo *lexinfo)
         }
     }
 
+    printf("\nParsing\t: %s : Done\n",lexinfo->file_name);
     return e_success;
 }
 
@@ -51,12 +55,21 @@ Status get_next_character(LexInfo *lexinfo)
 
 Status identify_token(LexInfo *lexinfo)
 {
-    /* Checks if 1st charcter is letter or space */
+    /* Keyword / Identifier*/
     if((lexinfo->ch >= 'A' && lexinfo->ch <= 'Z') ||
        (lexinfo->ch >= 'a' && lexinfo->ch <= 'z') ||
        (lexinfo->ch == '_'))
     {
         if(identify_keyword_or_identifer(lexinfo) == e_failure)
+            return e_failure;
+    }
+
+    /* int / float / char / string Literals */
+    else if((lexinfo->ch >= '0' && lexinfo->ch <= '9') ||
+            (lexinfo->ch == '.') || (lexinfo->ch == '\'') ||
+            (lexinfo->ch == '"'))
+    {
+        if(identify_literals(lexinfo) == e_failure)
             return e_failure;
     }
 
@@ -83,9 +96,9 @@ Status identify_keyword_or_identifer(LexInfo *lexinfo)
 
     /* Check whether token is keyword */
     if(check_keyword(lexinfo) == e_success)
-        printf("Keyword\t\t:%s\n",lexinfo->token);
+        printf("Keyword\t\t: %s\n",lexinfo->token);
     else
-        printf("Identifier\t:%s\n",lexinfo->token);
+        printf("Identifier\t: %s\n",lexinfo->token);
 
 
     return e_success;
@@ -131,4 +144,78 @@ Status check_keyword(LexInfo *lexinfo)
     }
 
     return e_failure;
+}
+
+Status identify_literals(LexInfo *lexinfo)
+{
+    int i = 0;
+    
+    /* int / float literal */
+    if(lexinfo->ch >= '0' && lexinfo->ch <= '9'){
+        while((lexinfo->ch >= '0' && lexinfo->ch <= '9') || (lexinfo->ch == '.'))
+        {
+            lexinfo->token[i++] = lexinfo->ch;
+
+            if(get_next_character(lexinfo) == e_failure){
+                printf("Error : Invalid int/float literal\n");
+                return e_failure;
+            }
+        }
+    }
+    
+    /* String literal */
+    else if(lexinfo->ch == '"')
+    {
+        lexinfo->token[i++] = lexinfo->ch;      // storing starting " (double quote)
+
+        if(get_next_character(lexinfo) == e_failure)    // getting next character
+                return e_failure;
+
+        while(lexinfo->ch != '"')
+        {
+            lexinfo->token[i++] = lexinfo->ch;
+
+            if(get_next_character(lexinfo) == e_failure)        // getting next character
+            {
+                printf("Error : Invalid string literal\n");
+                return e_failure;
+            }
+        }
+
+        lexinfo->token[i++] = lexinfo->ch;      // Storing ending " (double quote)
+    }
+
+    /* Character literal */
+    else if(lexinfo->ch == '\'')
+    {
+        lexinfo->token[i++] = lexinfo->ch;        // storing starting ' (single quote)  
+
+        if(get_next_character(lexinfo) == e_failure)    // getting next character
+                return e_failure;
+
+        while(lexinfo->ch != '\'')
+        {
+            lexinfo->token[i++] = lexinfo->ch;
+
+            if(get_next_character(lexinfo) == e_failure)        // getting next character
+            {
+                printf("Error : Invalid character literal\n");
+                return e_failure;
+            }    
+        }
+
+        lexinfo->token[i++] = lexinfo->ch;      // Storing ending " (double quote)
+    }
+
+    else{
+        printf("Error : Invalid literal\n");
+        return e_failure;
+    }
+    
+
+    lexinfo->token[i] = '\0';
+
+    printf("Literal\t\t: %s\n",lexinfo->token);
+
+    return e_success;
 }

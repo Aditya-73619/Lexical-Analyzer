@@ -34,4 +34,10 @@ Status identify_keyword_or_identifer(LexInfo *lexinfo);
 /* Check token is keyword or not */
 Status check_keyword(LexInfo *lexinfo);
 
+/* Checking the literals */
+Status identify_literals(LexInfo *lexinfo);
+
+
+
+
 #endif
