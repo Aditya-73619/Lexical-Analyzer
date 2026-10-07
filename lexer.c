@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "lexer.h"
 #include "types.h"
 
@@ -31,7 +32,10 @@ Status read_and_validate_args(char *argv[], LexInfo *lexinfo)
 
 Status do_lexical_analysis(LexInfo *lexinfo)
 {
-    while(get_next_character(lexinfo) == e_success){
+    if(get_next_character(lexinfo) == e_failure)
+        return e_failure;
+
+    while(lexinfo->ch != EOF){
         if(identify_token(lexinfo) == e_failure){
             printf("Error : Invalid token\n");
             return e_failure;
@@ -56,16 +60,14 @@ Status get_next_character(LexInfo *lexinfo)
 Status identify_token(LexInfo *lexinfo)
 {
     /* Keyword / Identifier*/
-    if((lexinfo->ch >= 'A' && lexinfo->ch <= 'Z') ||
-       (lexinfo->ch >= 'a' && lexinfo->ch <= 'z') ||
-       (lexinfo->ch == '_'))
+    if((isalpha(lexinfo->ch)) || (lexinfo->ch == '_'))
     {
         if(identify_keyword_or_identifer(lexinfo) == e_failure)
             return e_failure;
     }
 
     /* int / float / char / string Literals */
-    else if((lexinfo->ch >= '0' && lexinfo->ch <= '9') ||
+    else if(isdigit(lexinfo->ch) ||
             (lexinfo->ch == '.') || (lexinfo->ch == '\'') ||
             (lexinfo->ch == '"'))
     {
@@ -73,6 +75,16 @@ Status identify_token(LexInfo *lexinfo)
             return e_failure;
     }
 
+    /* Operators + brackets + ; */
+    else if(lexinfo->ch != ' ' && lexinfo->ch != '\n' && lexinfo->ch != '\t' && lexinfo->ch != '#')
+    {
+        if(identify_operators(lexinfo) == e_failure){
+            return e_failure;
+        }
+    }
+
+    else
+        get_next_character(lexinfo);
 
     return e_success;
 }
@@ -82,9 +94,7 @@ Status identify_keyword_or_identifer(LexInfo *lexinfo)
     int i = 0;
 
     /* Getting and storing all characters in token */
-    while((lexinfo->ch >= 'A' && lexinfo->ch <= 'Z') ||
-          (lexinfo->ch >= 'a' && lexinfo->ch <= 'z') ||
-          (lexinfo->ch >= '0' && lexinfo->ch <= '9') || lexinfo->ch == '_')
+    while((isalpha(lexinfo->ch)) || (isdigit(lexinfo->ch)) || (lexinfo->ch == '_'))
     {
         lexinfo->token[i++] = lexinfo->ch;  //Storing character in token
         
@@ -151,8 +161,8 @@ Status identify_literals(LexInfo *lexinfo)
     int i = 0;
     
     /* int / float literal */
-    if(lexinfo->ch >= '0' && lexinfo->ch <= '9'){
-        while((lexinfo->ch >= '0' && lexinfo->ch <= '9') || (lexinfo->ch == '.'))
+    if(isdigit(lexinfo->ch)){
+        while(isdigit(lexinfo->ch) || (lexinfo->ch == '.'))
         {
             lexinfo->token[i++] = lexinfo->ch;
 
@@ -183,6 +193,9 @@ Status identify_literals(LexInfo *lexinfo)
         }
 
         lexinfo->token[i++] = lexinfo->ch;      // Storing ending " (double quote)
+        
+        if(get_next_character(lexinfo) == e_failure)    // getting next character
+                return e_failure;
     }
 
     /* Character literal */
@@ -205,6 +218,9 @@ Status identify_literals(LexInfo *lexinfo)
         }
 
         lexinfo->token[i++] = lexinfo->ch;      // Storing ending " (double quote)
+
+        if(get_next_character(lexinfo) == e_failure)    // getting next character
+                return e_failure;
     }
 
     else{
@@ -218,4 +234,40 @@ Status identify_literals(LexInfo *lexinfo)
     printf("Literal\t\t: %s\n",lexinfo->token);
 
     return e_success;
+}
+
+Status identify_operators(LexInfo *lexinfo)
+{
+    char op_buffer[4] = {'\0'};          // buffer string with all 4 character as NULL
+    char operator[] = "+-*/%=<>!&|^~?:(){}[];,.";       // string of operators
+
+    op_buffer[0] = lexinfo->ch;         // storing first character in buffer string
+
+    get_next_character(lexinfo);
+
+    if((lexinfo->ch == '=') || (lexinfo->ch == op_buffer[0]) || 
+       (op_buffer[0] == '-' && lexinfo->ch == '>'))
+    {
+        op_buffer[1] = lexinfo->ch;         // storing second character in buffer string
+        
+        get_next_character(lexinfo);
+
+        if((op_buffer[0] == '<' || op_buffer[0] == '>') &&
+           (op_buffer[0] == op_buffer[1]))
+        {
+            get_next_character(lexinfo);
+
+            if(lexinfo->ch == '='){
+                op_buffer[2] = lexinfo->ch;         // storing 3rd character in buffer string
+            }
+        }   
+    }
+
+    if(strchr(operator,op_buffer[0])){
+        printf("Operator\t: %s\n",op_buffer);
+        return e_success;
+    }
+
+    printf("Error : Invalid operator\n");
+    return e_failure;
 }

@@ -37,7 +37,8 @@ Status check_keyword(LexInfo *lexinfo);
 /* Checking the literals */
 Status identify_literals(LexInfo *lexinfo);
 
-
+/* Identifying the operators */
+Status identify_operators(LexInfo *lexinfo);
 
 
 #endif
