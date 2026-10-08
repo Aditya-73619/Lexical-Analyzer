@@ -28,6 +28,9 @@ Status get_next_character(LexInfo *lexinfo);
 /* Identify the token */
 Status identify_token(LexInfo *lexinfo);
 
+/* Identify preprocessor directives */
+Status identify_preprocessor_directive(LexInfo *lexinfo);
+
 /* Check if token is keyword or identifier */
 Status identify_keyword_or_identifer(LexInfo *lexinfo);
 

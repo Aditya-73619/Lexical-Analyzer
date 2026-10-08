@@ -59,11 +59,22 @@ Status get_next_character(LexInfo *lexinfo)
 
 Status identify_token(LexInfo *lexinfo)
 {
-    /* Keyword / Identifier*/
-    if((isalpha(lexinfo->ch)) || (lexinfo->ch == '_'))
+    /* Preprocessor directive */
+    if(lexinfo->ch == '#')
     {
-        if(identify_keyword_or_identifer(lexinfo) == e_failure)
+        if(identify_preprocessor_directive(lexinfo) == e_failure){
+            printf("Error : Invalid Preprocessor Directive\n");
             return e_failure;
+        }
+    }
+
+    /* Keyword / Identifier*/
+    else if((isalpha(lexinfo->ch)) || (lexinfo->ch == '_'))
+    {
+        if(identify_keyword_or_identifer(lexinfo) == e_failure){
+            printf("Error : Invalid Keyword or Identifier\n");
+            return e_failure;
+        }
     }
 
     /* int / float / char / string Literals */
@@ -71,14 +82,17 @@ Status identify_token(LexInfo *lexinfo)
             (lexinfo->ch == '.') || (lexinfo->ch == '\'') ||
             (lexinfo->ch == '"'))
     {
-        if(identify_literals(lexinfo) == e_failure)
+        if(identify_literals(lexinfo) == e_failure){
+            printf("Error : Invalid Literal\n");
             return e_failure;
+        }
     }
 
     /* Operators + brackets + ; */
     else if(lexinfo->ch != ' ' && lexinfo->ch != '\n' && lexinfo->ch != '\t' && lexinfo->ch != '#')
     {
         if(identify_operators(lexinfo) == e_failure){
+            printf("Error : Invalid Operator\n");
             return e_failure;
         }
     }
@@ -86,6 +100,52 @@ Status identify_token(LexInfo *lexinfo)
     else
         get_next_character(lexinfo);
 
+    return e_success;
+}
+
+Status identify_preprocessor_directive(LexInfo *lexinfo)
+{
+    int i = 0;
+
+    lexinfo->token[i++] = lexinfo->ch;      // Storing #
+
+    if(get_next_character(lexinfo) == e_failure)     // Getting next character
+        return e_failure;
+    
+    /* storing #include */
+    while(lexinfo->ch != ' ')
+    {
+        
+        lexinfo->token[i++] = lexinfo->ch;      // Storing characters
+
+        if(get_next_character(lexinfo) == e_failure)     // Getting next character
+        return e_failure;
+    }
+
+    /* Get '<' */
+    if(get_next_character(lexinfo) == e_failure)     // Getting next character
+        return e_failure;
+
+    /* Storing <stdio.h> */
+    while(lexinfo->ch != '>')
+    {
+        lexinfo->token[i++] = lexinfo->ch;      // Storing characters
+
+        if(get_next_character(lexinfo) == e_failure)     // Getting next character
+        return e_failure;
+        
+    }
+
+    /* Storing '>' */
+    lexinfo->token[i++] = lexinfo->ch;
+
+    lexinfo->token[i] = '\0';
+
+    printf("Preprocessor Directive\t:\t%s\n",lexinfo->token);
+
+    if(get_next_character(lexinfo) == e_failure)     // Getting next character
+        return e_failure;
+    
     return e_success;
 }
 
@@ -99,16 +159,16 @@ Status identify_keyword_or_identifer(LexInfo *lexinfo)
         lexinfo->token[i++] = lexinfo->ch;  //Storing character in token
         
         if(get_next_character(lexinfo) == e_failure)     // Getting next character
-            break;
+            return e_failure;
     }
 
     lexinfo->token[i] = '\0';
 
     /* Check whether token is keyword */
     if(check_keyword(lexinfo) == e_success)
-        printf("Keyword\t\t: %s\n",lexinfo->token);
+        printf("Keyword\t\t\t:\t%s\n",lexinfo->token);
     else
-        printf("Identifier\t: %s\n",lexinfo->token);
+        printf("Identifier\t\t:\t%s\n",lexinfo->token);
 
 
     return e_success;
@@ -159,11 +219,14 @@ Status check_keyword(LexInfo *lexinfo)
 Status identify_literals(LexInfo *lexinfo)
 {
     int i = 0;
-    
+    int dec_count = 0;
     /* int / float literal */
     if(isdigit(lexinfo->ch)){
         while(isdigit(lexinfo->ch) || (lexinfo->ch == '.'))
         {
+            if(lexinfo->ch == '.')
+                dec_count++;
+
             lexinfo->token[i++] = lexinfo->ch;
 
             if(get_next_character(lexinfo) == e_failure){
@@ -171,6 +234,14 @@ Status identify_literals(LexInfo *lexinfo)
                 return e_failure;
             }
         }
+
+        lexinfo->token[i] = '\0';
+
+        if(dec_count > 0)
+            printf("Float Literal\t\t:\t%s\n",lexinfo->token);
+        else
+            printf("Integer Literal\t\t:\t%s\n",lexinfo->token);
+
     }
     
     /* String literal */
@@ -196,6 +267,10 @@ Status identify_literals(LexInfo *lexinfo)
         
         if(get_next_character(lexinfo) == e_failure)    // getting next character
                 return e_failure;
+
+        lexinfo->token[i] = '\0';
+
+        printf("String Literal\t\t:\t%s\n",lexinfo->token);
     }
 
     /* Character literal */
@@ -221,6 +296,10 @@ Status identify_literals(LexInfo *lexinfo)
 
         if(get_next_character(lexinfo) == e_failure)    // getting next character
                 return e_failure;
+
+        lexinfo->token[i] = '\0';
+
+        printf("Character Literal\t:\t%s\n",lexinfo->token);
     }
 
     else{
@@ -228,10 +307,6 @@ Status identify_literals(LexInfo *lexinfo)
         return e_failure;
     }
     
-
-    lexinfo->token[i] = '\0';
-
-    printf("Literal\t\t: %s\n",lexinfo->token);
 
     return e_success;
 }
@@ -264,7 +339,7 @@ Status identify_operators(LexInfo *lexinfo)
     }
 
     if(strchr(operator,op_buffer[0])){
-        printf("Operator\t: %s\n",op_buffer);
+        printf("Operator\t\t:\t%s\n",op_buffer);
         return e_success;
     }
 
