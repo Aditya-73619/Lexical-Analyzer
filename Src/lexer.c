@@ -138,74 +138,8 @@ Status identify_preprocessor_directive(LexInfo *lexinfo)
             return e_failure;
     }
 
-    return e_success;
-
-    #if 0
-    int i = 0;
-
-    lexinfo->token[i++] = lexinfo->ch;      // Storing #
-
-    if(get_next_character(lexinfo) == e_failure)     // Getting next character
-        return e_failure;
-    
-    /* #include */
-    if(lexinfo->ch == 'i')
-    {
-        /* storing #include */
-        while(lexinfo->ch != ' ')
-        {
-            
-            lexinfo->token[i++] = lexinfo->ch;      // Storing characters
-
-            if(get_next_character(lexinfo) == e_failure)     // Getting next character
-            return e_failure;
-        }
-
-        /* Get '<' */
-        if(get_next_character(lexinfo) == e_failure)     // Getting next character
-            return e_failure;
-
-        /* Storing <stdio.h> */
-        while(lexinfo->ch != '>')
-        {
-            lexinfo->token[i++] = lexinfo->ch;      // Storing characters
-
-            if(get_next_character(lexinfo) == e_failure)     // Getting next character
-            return e_failure;
-            
-        }
-
-        /* Storing '>' */
-        lexinfo->token[i++] = lexinfo->ch;
-    }
-
-    if(lexinfo->ch == 'd')
-    {
-        while(lexinfo->ch != '\n')
-        {
-            lexinfo->token[i++] = lexinfo->ch;
-
-            if(get_next_character(lexinfo) == e_failure)
-                return e_failure;
-        }
-
-        lexinfo->token[i] = '\0';
-    }
-
-
-
-
-
-
-    lexinfo->token[i] = '\0';
-
-    printf("Preprocessor Directive\t:\t%s\n",lexinfo->token);
-
-    if(get_next_character(lexinfo) == e_failure)     // Getting next character
-        return e_failure;
     
     return e_success;
-    #endif
 }
 
 Status identify_keyword_or_identifer(LexInfo *lexinfo)
