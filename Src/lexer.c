@@ -4,6 +4,7 @@
 #include "lexer.h"
 #include "types.h"
 
+
 Status read_and_validate_args(char *argv[], LexInfo *lexinfo)
 {
     /* Validating extension as .c */

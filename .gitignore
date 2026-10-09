@@ -1,0 +1,10 @@
+# Compiled executables
+a.out
+lexer
+
+# Object files
+*.o
+
+# macOS files
+.DS_Store
+
