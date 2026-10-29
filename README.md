@@ -1,155 +1,157 @@
-# Lexical Analyzer in C
+# 🔍 Lexical Analyzer in C
 
-A **Lexical Analyzer (Tokenizer)** built in C that reads a C source file and classifies its contents into meaningful tokens — a core component of compiler front-end design.
+## 📌 Overview
 
----
+This project implements a **Lexical Analyzer (Lexer)** using the C programming language. Lexical analysis is the first phase of a compiler, where source code is scanned and converted into meaningful tokens.
 
-## Table of Contents
+The analyzer reads a C source file character by character, identifies tokens according to lexical rules, and classifies them into categories such as keywords, identifiers, constants, operators, and special symbols.
 
-- [Overview](#overview)
-- [Features](#features)
-- [Token Types](#token-types)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Sample Output](#sample-output)
-- [Error Handling](#error-handling)
-- [Future Improvements](#future-improvements)
-- [Author](#author)
+It also validates command-line arguments and reports errors for invalid tokens or operators encountered during analysis.
 
 ---
 
-## Overview
+## 🚀 Features
 
-This project implements the first phase of a compiler — **lexical analysis**. The analyzer scans a C source file character-by-character and groups characters into tokens based on predefined lexical rules. It also performs basic syntax validation such as brace balancing and unterminated string detection.
-
----
-
-## Features
-
-- Detects all standard **C keywords** (`int`, `if`, `while`, `return`, etc.)
-- Identifies **identifiers** (variable and function names)
-- Recognizes **operators** (`+`, `-`, `*`, `/`, `=`, etc.)
-- Detects **symbols and braces** (`;`, `{`, `}`, `(`, `)`)
-- Parses **numeric constants**
-- Handles **string literals**
-- Detects **preprocessor directives** (`#include`, `#define`, etc.)
-- Skips **single-line** (`//`) and **multi-line** (`/* */`) comments
-- Reports **line numbers** for each token
+- Identifies **C keywords** such as `int`, `char`, `if`, and `return`.
+- Recognizes **identifiers**, including variable and function names.
+- Detects **integer and floating-point constants**.
+- Identifies **operators** used in expressions.
+- Recognizes **special symbols** such as `;`, `,`, `(`, and `)`.
+- Handles **string literals**.
+- Reads a source filename through command-line arguments.
+- Validates input arguments before starting lexical analysis.
+- Reports invalid operators and invalid tokens.
+- Displays the result of the lexical analysis process.
 
 ---
 
-## Token Types
+## 🛠️ Technologies Used
 
-| Token Type             | Example                  |
-|------------------------|--------------------------|
-| Keyword                | `int`, `return`, `while` |
-| Identifier             | `count`, `main`, `total` |
-| Operator               | `+`, `-`, `=`, `*`       |
-| Symbol                 | `;`, `,`, `.`            |
-| Curly Brace Opening    | `{`                      |
-| Curly Brace Closing    | `}`                      |
-| Round Brace Opening    | `(`                      |
-| Round Brace Closing    | `)`                      |
-| Numeric Constant       | `42`, `100`              |
-| String Literal         | `"Hello, World!"`        |
-| Preprocessor Directive | `#include <stdio.h>`     |
+- C Programming
+- GCC Compiler
+- File Handling
+- Character-by-Character Parsing
+- Lexical Analysis and Tokenization
+- Command-Line Argument Handling (`argc` and `argv`)
+- Header Files and Modular Programming
+- Error Handling
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
-```
-Lexical_Analyzer/
-├── main.c        # Core lexer logic
-├── header.h      # Token definitions and function declarations
+```text
+Lexical-Analyzer/
+├── Src/
+│   ├── main.c
+│   ├── lexer.c
+│   ├── lexer.h
+│   └── types.h
+├── Example/
+│   └── sample.c
 └── README.md
 ```
 
+- `main.c` — Entry point of the program; validates the argument count and initiates lexical analysis.
+- `lexer.c` — Implements the lexical analysis logic.
+- `lexer.h` — Contains lexer-related declarations.
+- `types.h` — Defines data types and related definitions used by the project.
+- `sample.c` — Example C source file to analyze.
+
 ---
 
-## Getting Started
+## ⚙️ How to Run
 
 ### Prerequisites
 
 - GCC compiler
-- A Linux/macOS terminal or Windows with MinGW/WSL
+- Linux or macOS terminal, or a compatible environment
 
-### Compile
-
-```bash
-gcc main.c -o lexer
-```
-
-### Run
+### 1. Navigate to the source directory
 
 ```bash
-./lexer sample.c
+cd Src
 ```
 
-Replace `sample.c` with the path to any C source file you want to analyze.
+### 2. Compile the program
+
+```bash
+gcc main.c lexer.c -o lexer
+```
+
+### 3. Run the analyzer
+
+Pass the C source file as a command-line argument:
+
+```bash
+./lexer ../Example/sample.c
+```
+
+Replace `sample.c` with the path to the C source file you want to analyze.
+
+**Important:** The program expects exactly one command-line argument: the input C source filename.
 
 ---
 
-## Sample Output
+## 🧩 Token Types
 
-Given the input:
+The lexer classifies supported input into categories such as:
+
+| Token Type | Examples |
+|---|---|
+| Keyword | `int`, `return`, `if` |
+| Identifier | `main`, `count`, `total` |
+| Integer Constant | `10`, `42`, `100` |
+| Floating-Point Constant | `3.14`, `2.5` |
+| Operator | `+`, `-`, `=`, `*` |
+| Special Symbol | `;`, `,`, `(`, `)` |
+| String Literal | `"Hello World"` |
+
+The exact tokens recognized depend on the lexical rules implemented in the source code.
+
+---
+
+## 💻 Sample Input
+
+Consider the following C program saved as `sample.c`:
 
 ```c
-int main() {
-    return 0;
+int main()
+{
+    int num = 10;
+    return num;
 }
 ```
 
-The analyzer produces:
+The lexer reads this file and identifies the supported tokens, such as `int`, `main`, `(`, `)`, `num`, `=`, `10`, and `return`.
 
-```
-Line  1 : Keyword              : int
-Line  1 : Identifier           : main
-Line  1 : Round brace opening  : (
-Line  1 : Round brace closing  : )
-Line  1 : Curly brace opening  : {
-Line  2 : Keyword              : return
-Line  2 : Numeric constant     : 0
-Line  2 : Symbol               : ;
-Line  3 : Curly brace closing  : }
+When lexical analysis completes successfully, the program prints:
+
+```text
+Analysis is Success
 ```
 
----
-
-## Error Handling
-
-The analyzer detects and reports the following errors:
-
-| Error                    | Description                                      |
-|--------------------------|--------------------------------------------------|
-| Unbalanced `()`          | More opening or closing round braces than expected  |
-| Unbalanced `{}`          | More opening or closing curly braces than expected  |
-| Unterminated string      | A string literal that is not properly closed with `"` |
+The program reports an error if the command-line arguments are invalid or if the lexer encounters an invalid token or operator.
 
 ---
 
-## Future Improvements
+## 🧠 Concepts Practiced
 
-- [ ] Multi-character operator support (`==`, `!=`, `<=`, `>=`, `&&`, `||`)
-- [ ] Floating-point constant parsing (`3.14`, `2.0e5`)
-- [ ] Token count statistics summary at end of output
-- [ ] Symbol table generation
-- [ ] Transition into a syntax analysis (parsing) phase
+- Fundamentals of Compiler Design
+- Lexical Analysis and Tokenization
+- Character Processing in C
+- File Handling
+- Structures, Enumerations, and User-Defined Types
+- Header Files and Modular Programming
+- Command-Line Argument Validation
+- Error Detection and Handling
 
----
-
-## Concepts Practiced
-
-- Lexical Analysis & Tokenization
-- Character classification using `ctype.h`
-- File handling in C
-- Brace/bracket balancing
-- Compiler Design fundamentals
 
 ---
 
-## Author
+
+## 👨‍💻 Author
 
 **Aditya Gupta**
 
-> This project helped me understand the fundamentals of compiler design and lexical analysis by building the first phase of a compiler from scratch.
+This project helped me strengthen my understanding of C programming, tokenization, file handling, and the fundamentals of compiler design by implementing a lexical analyzer from scratch.
