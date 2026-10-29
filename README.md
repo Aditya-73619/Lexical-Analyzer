@@ -150,6 +150,6 @@ The analyzer detects and reports the following errors:
 
 ## Author
 
-**Swati Pathak**
+**Aditya Gupta**
 
 > This project helped me understand the fundamentals of compiler design and lexical analysis by building the first phase of a compiler from scratch.
